@@ -1,12 +1,12 @@
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
 #define M 3
 #define epsion0 0.00000001
 #define N 100000
 
-void printMatrix(double a[][3],int m,int n);
-void printVector(double a[],int m);
+double fabs_new(double x);
+double sqrt_new(double x);
+
 double dotVector(double a[],double b[],int m);
 void dotMatrVect(double a[][3],double yk[],double uk1[],int m);
 void unitVector(double a[],double yeta,int m);
@@ -21,18 +21,15 @@ int main(void)
     double beta1=0.0;
     double yita0=0.0;
     double epsion=0.0;
-    printMatrix(a,M,M);
-    printVector(uk0,M);
+
     int i=0;
     for(i=0;i<N;i++)
     {
-        printVector(uk0,M);
-        yita0 =sqrt(dotVector(uk0,uk0,M));
+
+        yita0 =sqrt_new(dotVector(uk0,uk0,M));
         unitVector(uk0,yita0,M);
         dotMatrVect(a,uk0,uk1,M);
         beta1=dotVector(uk0,uk1,M);
-        if(i>0)
-            printf("%lf",beta1);
         epsion = relaError(beta0,beta1);
         if(epsion<epsion0)
         {
@@ -48,28 +45,31 @@ int main(void)
             beta0=beta1;
         }
     }
-    system("pause");
+    system("read");
 }
 
-void printMatrix(double a[][M],int m,int n)
+double fabs_new(double dnumber)
 {
-    int i;
-    for(i=0;i<m;i++)
-    {
-        int j;
-        for(j=0;j<n;j++)
-        {
-            printf("%lf ",a[i][j]);
-        }
-    }
+    *( ( (int *) & dnumber) + 1) &=0x7FFFFFFF;
+    return dnumber;
+}
+double sqrt_new(double x)
+{
+	//float后加f转换成double类型
+    if(x == 0) return 0; 
+    float result = x; 
+    float xhalf = 0.5f*result; 
+    int i = *(int*)&result; 
+    
+    // what the fuck? 
+    i = 0x5f3759df - (i>>1); 
+    result = *(float*)&i; 
+    result = result*(1.5f-xhalf*result*result);
+    result = result*(1.5f-xhalf*result*result); 
+    return 1.0f/result; 
 }
 
-void printVector(double a[],int m)
-{
-    int i;
-    for(i=0;i<m;i++)
-        printf("%lf ",a[i]);
-}
+
 
 double dotVector(double a[],double b[],int m)
 {
@@ -111,6 +111,6 @@ void unitVector(double a[],double yita,int m)
 double relaError(double beta1,double beta2)
 {
     double epsion;
-    epsion=fabs(beta2-beta1)/fabs(beta2);
+    epsion=fabs_new(beta2-beta1)/fabs_new(beta2);
     return epsion;
 }
