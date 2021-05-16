@@ -69,7 +69,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
-from matplotlib import mpl
+import matplotlib as mpl
 from matplotlib.colors import colorConverter
 from matplotlib import pyplot
 import Pmw
@@ -1365,7 +1365,8 @@ class graphManager:
         interpolation = 'nearest'
         norm = plotFormat.norm
         im = self.plot.imshow(y, cmap = cmap, interpolation = interpolation, aspect = 'auto', norm = norm )
-        tmp = im.get_axes().get_position().get_points()
+        # tmp = im.get_axes().get_position().get_points()
+        tmp = im.get_window_extent().get_points()
 
         if (plotID in self.cbarAxes):
             self.figure.delaxes(self.cbarAxes[plotID])
